@@ -1,0 +1,9 @@
+node_modules
+dist
+logs
+storage
+.env
+.env.*
+.agents
+docs/ai
+npm-debug.log*

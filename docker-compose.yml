@@ -1,0 +1,150 @@
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:15}
+    container_name: nexus-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: nexus
+      APP_DB_USER: ${APP_DB_USER:-nexus_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - nexus_pg_data:/var/lib/postgresql/data
+      - ./backend/sql:/sql:ro
+      - ./backend/sql/docker-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d nexus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: ${REDIS_IMAGE:-redis:7-alpine}
+    container_name: nexus-redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - nexus_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  app:
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-}
+        NODE_IMAGE: ${NODE_IMAGE:-node:22-alpine}
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org/}
+    container_name: nexus-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-https://your-domain.example}
+      DATABASE_URL: postgresql://${APP_DB_USER:-nexus_app}:${APP_DB_PASSWORD:?set APP_DB_PASSWORD in .env}@postgres:5432/nexus?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-15m}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL:-7d}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      COOKIE_SAME_SITE: ${COOKIE_SAME_SITE:-strict}
+      CSRF_COOKIE_NAME: ${CSRF_COOKIE_NAME:-csrfToken}
+      DEFAULT_ROOT_USERNAME: ${DEFAULT_ROOT_USERNAME:?set DEFAULT_ROOT_USERNAME in .env}
+      DEFAULT_ROOT_PASSWORD: ${DEFAULT_ROOT_PASSWORD:?set DEFAULT_ROOT_PASSWORD in .env}
+      RESET_ROOT_PASSWORD_ON_BOOT: ${RESET_ROOT_PASSWORD_ON_BOOT:-false}
+      DEFAULT_ROOT_EMAIL: ${DEFAULT_ROOT_EMAIL:-}
+      REGISTRATION_MODE: ${REGISTRATION_MODE:-private}
+      LINK_PREVIEW_ENABLED: ${LINK_PREVIEW_ENABLED:-false}
+      LINK_PREVIEW_METADATA_CACHE_TTL_SECONDS: ${LINK_PREVIEW_METADATA_CACHE_TTL_SECONDS:-3600}
+      LINK_PREVIEW_NEGATIVE_CACHE_TTL_SECONDS: ${LINK_PREVIEW_NEGATIVE_CACHE_TTL_SECONDS:-5}
+      LINK_PREVIEW_FETCH_TIMEOUT_MS: ${LINK_PREVIEW_FETCH_TIMEOUT_MS:-4000}
+      LINK_PREVIEW_HTML_MAX_BYTES: ${LINK_PREVIEW_HTML_MAX_BYTES:-262144}
+      LINK_PREVIEW_MAX_REDIRECTS: ${LINK_PREVIEW_MAX_REDIRECTS:-3}
+      LINK_PREVIEW_RATE_LIMIT_WINDOW_MS: ${LINK_PREVIEW_RATE_LIMIT_WINDOW_MS:-60000}
+      LINK_PREVIEW_RATE_LIMIT_MAX: ${LINK_PREVIEW_RATE_LIMIT_MAX:-30}
+      LINK_PREVIEW_IMAGE_CACHE_ENABLED: ${LINK_PREVIEW_IMAGE_CACHE_ENABLED:-true}
+      LINK_PREVIEW_IMAGE_CACHE_DIR: ${LINK_PREVIEW_IMAGE_CACHE_DIR:-/app/storage/link-preview-cache}
+      LINK_PREVIEW_IMAGE_CACHE_TTL_SECONDS: ${LINK_PREVIEW_IMAGE_CACHE_TTL_SECONDS:-86400}
+      LINK_PREVIEW_IMAGE_CACHE_MAX_TOTAL_BYTES: ${LINK_PREVIEW_IMAGE_CACHE_MAX_TOTAL_BYTES:-524288000}
+      LINK_PREVIEW_IMAGE_CACHE_MAX_FILE_BYTES: ${LINK_PREVIEW_IMAGE_CACHE_MAX_FILE_BYTES:-2097152}
+      LINK_PREVIEW_IMAGE_CACHE_CLEANUP_INTERVAL_SECONDS: ${LINK_PREVIEW_IMAGE_CACHE_CLEANUP_INTERVAL_SECONDS:-3600}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      STRICT_PRODUCTION_SECURITY: ${STRICT_PRODUCTION_SECURITY:-true}
+      ENFORCE_HTTPS: ${ENFORCE_HTTPS:-true}
+      JSON_BODY_LIMIT: ${JSON_BODY_LIMIT:-256kb}
+      URLENCODED_BODY_LIMIT: ${URLENCODED_BODY_LIMIT:-64kb}
+      GLOBAL_RATE_LIMIT_WINDOW_MS: ${GLOBAL_RATE_LIMIT_WINDOW_MS:-60000}
+      GLOBAL_RATE_LIMIT_MAX: ${GLOBAL_RATE_LIMIT_MAX:-300}
+      AUTH_RATE_LIMIT_WINDOW_MS: ${AUTH_RATE_LIMIT_WINDOW_MS:-900000}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-10}
+      USER_LOOKUP_RATE_LIMIT_WINDOW_MS: ${USER_LOOKUP_RATE_LIMIT_WINDOW_MS:-60000}
+      USER_LOOKUP_RATE_LIMIT_MAX: ${USER_LOOKUP_RATE_LIMIT_MAX:-60}
+      UPLOAD_RATE_LIMIT_WINDOW_MS: ${UPLOAD_RATE_LIMIT_WINDOW_MS:-600000}
+      UPLOAD_RATE_LIMIT_MAX: ${UPLOAD_RATE_LIMIT_MAX:-20}
+      SOCKET_TYPING_LIMIT_PER_10S: ${SOCKET_TYPING_LIMIT_PER_10S:-20}
+      SOCKET_PRESENCE_LIMIT_PER_MIN: ${SOCKET_PRESENCE_LIMIT_PER_MIN:-20}
+      SOCKET_JOIN_LEAVE_LIMIT_PER_MIN: ${SOCKET_JOIN_LEAVE_LIMIT_PER_MIN:-60}
+      SOCKET_MARK_READ_LIMIT_PER_MIN: ${SOCKET_MARK_READ_LIMIT_PER_MIN:-120}
+      AUTH_LOCK_WINDOW_SECONDS: ${AUTH_LOCK_WINDOW_SECONDS:-900}
+      AUTH_LOCK_MAX_ATTEMPTS: ${AUTH_LOCK_MAX_ATTEMPTS:-10}
+      DB_CONNECTION_LIMIT: ${DB_CONNECTION_LIMIT:-25}
+      DB_POOL_TIMEOUT_SECONDS: ${DB_POOL_TIMEOUT_SECONDS:-15}
+      CACHE_PROVIDER: ${CACHE_PROVIDER:-redis}
+      CACHE_FALLBACK_TO_MEMORY: ${CACHE_FALLBACK_TO_MEMORY:-true}
+      CACHE_DEFAULT_TTL_SECONDS: ${CACHE_DEFAULT_TTL_SECONDS:-30}
+      CACHE_MAX_ENTRIES: ${CACHE_MAX_ENTRIES:-5000}
+      CACHE_CHATS_TTL_SECONDS: ${CACHE_CHATS_TTL_SECONDS:-10}
+      CACHE_USERS_TTL_SECONDS: ${CACHE_USERS_TTL_SECONDS:-30}
+      CACHE_LOOKUP_TTL_SECONDS: ${CACHE_LOOKUP_TTL_SECONDS:-60}
+      CACHE_CONTACTS_TTL_SECONDS: ${CACHE_CONTACTS_TTL_SECONDS:-15}
+      CACHE_MEMBERS_TTL_SECONDS: ${CACHE_MEMBERS_TTL_SECONDS:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_FILE_ENABLED: ${LOG_FILE_ENABLED:-true}
+      LOG_FILE_PATH: ${LOG_FILE_PATH:-/app/logs/backend-error.log}
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-3005}:4000"
+    volumes:
+      - app_storage:/app/storage
+      - app_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health',{headers:{'X-Forwarded-Proto':'https'}}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  migrate:
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:22-alpine}
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org/}
+    command: ["npm", "run", "db:migrate:prod"]
+    environment:
+      NODE_ENV: production
+      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_USER:?set POSTGRES_USER}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/nexus?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["migrate"]
+
+volumes:
+  nexus_pg_data:
+  nexus_redis_data:
+  app_storage:
+  app_logs:

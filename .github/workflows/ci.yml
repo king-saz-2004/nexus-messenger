@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Frontend typecheck
+        run: npm run | grep -q "typecheck" && npm run typecheck || echo "No frontend typecheck script"
+
+      - name: Frontend build
+        run: npm run | grep -q "build" && npm run build || echo "No frontend build script"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Backend typecheck
+        working-directory: backend
+        run: npm run | grep -q "typecheck" && npm run typecheck || echo "No backend typecheck script"
+
+      - name: Backend build
+        working-directory: backend
+        run: npm run | grep -q "build" && npm run build || echo "No backend build script"

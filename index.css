@@ -1,0 +1,663 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tg-bg-page: #0e1621;
+  --tg-bg-sidebar: #17212b;
+  --tg-bg-chat-area: #0b141a;
+  --tg-bg-header: #17212b;
+  --tg-bg-input-area: #17212b;
+  --tg-bg-input-field: #232e3c;
+  --tg-bg-surface: #1f2a36;
+  --tg-bg-modal: #1f2a36;
+
+  --tg-bubble-out: #2b5278;
+  --tg-bubble-out-hover: #36608d;
+  --tg-bubble-in: #182533;
+  --tg-bubble-in-hover: #223244;
+
+  --tg-accent: #5d8fcb;
+  --tg-accent-hover: #6d9ad0;
+
+  --tg-text-primary: #e6edf3;
+  --tg-text-secondary: #95a4b5;
+  --tg-text-tertiary: #6f7f91;
+  --tg-text-link: #7ab7ff;
+  --tg-text-out-time: rgba(230, 237, 243, 0.65);
+  --tg-text-in-time: rgba(230, 237, 243, 0.45);
+  --tg-text-success: #6ad28e;
+
+  --tg-hover: rgba(255, 255, 255, 0.08);
+  --tg-active: rgba(255, 255, 255, 0.14);
+  --tg-selected: #2b5278;
+
+  --tg-border: rgba(255, 255, 255, 0.1);
+
+  --tg-badge-bg: #64a4e8;
+  --tg-badge-muted-bg: #5e6f7f;
+  --tg-badge-text: #ffffff;
+}
+
+[data-theme='light'] {
+  --tg-bg-page: #f4f6fa;
+  --tg-bg-sidebar: #ffffff;
+  --tg-bg-chat-area: #eaf1f9;
+  --tg-bg-header: #ffffff;
+  --tg-bg-input-area: #ffffff;
+  --tg-bg-input-field: #f2f5f7;
+  --tg-bg-surface: #ffffff;
+  --tg-bg-modal: #ffffff;
+
+  --tg-bubble-out: #d9fdd3;
+  --tg-bubble-out-hover: #ccf3c4;
+  --tg-bubble-in: #ffffff;
+  --tg-bubble-in-hover: #f4f7fb;
+
+  --tg-accent: #3390ec;
+  --tg-accent-hover: #2d83da;
+
+  --tg-text-primary: #1f2933;
+  --tg-text-secondary: #5f6e7d;
+  --tg-text-tertiary: #8794a1;
+  --tg-text-link: #267fdb;
+  --tg-text-out-time: rgba(31, 41, 51, 0.65);
+  --tg-text-in-time: rgba(31, 41, 51, 0.5);
+  --tg-text-success: #1a9e56;
+
+  --tg-hover: rgba(21, 31, 41, 0.06);
+  --tg-active: rgba(21, 31, 41, 0.12);
+  --tg-selected: #dceeff;
+
+  --tg-border: rgba(31, 41, 51, 0.12);
+
+  --tg-badge-bg: #2f8ff0;
+  --tg-badge-muted-bg: #adb8c4;
+  --tg-badge-text: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--tg-bg-page);
+  color: var(--tg-text-primary);
+  overflow: hidden;
+}
+
+html[dir='rtl'] body {
+  direction: rtl;
+}
+
+html[dir='ltr'] body {
+  direction: ltr;
+}
+
+.bidi-text {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+.bidi-isolate {
+  unicode-bidi: isolate;
+}
+
+.message-row-layout {
+  direction: ltr;
+}
+
+button {
+  font: inherit;
+}
+
+input,
+textarea {
+  color: inherit;
+}
+
+[data-theme='dark'] input,
+[data-theme='dark'] textarea {
+  color: var(--tg-text-primary);
+}
+
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+  color: var(--tg-text-tertiary);
+}
+
+[data-theme='dark'] input:-webkit-autofill,
+[data-theme='dark'] input:-webkit-autofill:hover,
+[data-theme='dark'] input:-webkit-autofill:focus,
+[data-theme='dark'] textarea:-webkit-autofill,
+[data-theme='dark'] textarea:-webkit-autofill:hover,
+[data-theme='dark'] textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--tg-text-primary);
+  box-shadow: 0 0 0 1000px var(--tg-bg-input-field) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.chat-wallpaper {
+  background-color: var(--tg-bg-chat-area);
+  background-image:
+    radial-gradient(circle at 20% 8%, rgba(122, 183, 255, 0.13), transparent 34%),
+    radial-gradient(circle at 82% 22%, rgba(122, 183, 255, 0.08), transparent 28%);
+}
+
+.auth-backdrop {
+  background-color: var(--tg-bg-page);
+  background-image:
+    radial-gradient(circle at 14% 18%, rgba(122, 183, 255, 0.18), transparent 30%),
+    radial-gradient(circle at 84% 86%, rgba(122, 183, 255, 0.14), transparent 36%);
+}
+
+.auth-orb {
+  position: absolute;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 999px;
+  filter: blur(58px);
+  pointer-events: none;
+  opacity: 0.42;
+  z-index: 0;
+}
+
+.auth-orb-left {
+  inset-inline-start: -9rem;
+  inset-block-start: -7rem;
+  background: rgba(93, 143, 203, 0.55);
+}
+
+.auth-orb-right {
+  inset-inline-end: -10rem;
+  inset-block-end: -8rem;
+  background: rgba(122, 183, 255, 0.42);
+}
+
+.auth-hero {
+  background:
+    linear-gradient(135deg, rgba(122, 183, 255, 0.16), rgba(47, 92, 138, 0.28)),
+    radial-gradient(circle at 72% 18%, rgba(143, 199, 255, 0.35), transparent 38%),
+    var(--tg-bg-header);
+  border-inline-end: 1px solid var(--tg-border);
+}
+
+[data-theme='light'] .auth-hero {
+  background:
+    linear-gradient(135deg, rgba(51, 144, 236, 0.12), rgba(39, 127, 219, 0.2)),
+    radial-gradient(circle at 72% 18%, rgba(47, 143, 240, 0.22), transparent 40%),
+    #f8fbff;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid rgba(122, 183, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.sidebar-scroll,
+.message-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(149, 164, 181, 0.45) transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar,
+.message-scroll::-webkit-scrollbar {
+  width: 0.45rem;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track,
+.message-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb,
+.message-scroll::-webkit-scrollbar-thumb {
+  background: rgba(149, 164, 181, 0.45);
+  border-radius: 999px;
+}
+
+.voice-wave-track {
+  display: grid;
+  grid-template-columns: repeat(40, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.125rem;
+  height: 1.25rem;
+}
+
+.voice-wave-bar {
+  width: 100%;
+  min-height: 0.2rem;
+  border-radius: 999px;
+  background: rgba(230, 237, 243, 0.92);
+  transition: opacity 120ms linear;
+}
+
+[data-theme='light'] .voice-wave-bar {
+  background: rgba(31, 41, 51, 0.78);
+}
+
+.voice-progress-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 0.9rem;
+}
+
+.voice-progress-rail {
+  position: absolute;
+  inset-inline: 0;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: rgba(230, 237, 243, 0.24);
+  overflow: hidden;
+}
+
+[data-theme='light'] .voice-progress-rail {
+  background: rgba(31, 41, 51, 0.2);
+}
+
+.voice-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tg-accent);
+  transition: width 110ms linear;
+}
+
+.voice-progress-input {
+  appearance: none;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.voice-progress-input::-webkit-slider-runnable-track {
+  height: 0.9rem;
+  background: transparent;
+  border: 0;
+}
+
+.voice-progress-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.72rem;
+  height: 0.72rem;
+  margin-top: 0.09rem;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: var(--tg-accent);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.voice-progress-shell:hover .voice-progress-input::-webkit-slider-thumb,
+.voice-progress-input:focus-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.voice-progress-input::-moz-range-track {
+  height: 0.9rem;
+  background: transparent;
+  border: 0;
+}
+
+.voice-progress-input::-moz-range-thumb {
+  width: 0.72rem;
+  height: 0.72rem;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: var(--tg-accent);
+  opacity: 0;
+}
+
+.voice-progress-shell:hover .voice-progress-input::-moz-range-thumb,
+.voice-progress-input:focus-visible::-moz-range-thumb {
+  opacity: 1;
+}
+
+/* Phase 17.4 responsive hardening: tablet layout tuning (no desktop changes) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Keep sidebar narrower on tablet while preserving split layout */
+  .md\:w-\[23rem\] {
+    width: 20rem !important;
+    max-width: 20rem;
+    flex: 0 0 20rem;
+  }
+
+  /* Slightly denser chat header and timeline spacing */
+  .chat-wallpaper > header {
+    padding-inline: 0.75rem;
+  }
+
+  .chat-wallpaper > .message-scroll {
+    padding-inline: 0.75rem;
+  }
+
+  /* Improve bubble readability on narrower tablet widths */
+  .max-w-\[min\(30rem\,72\%\)\] {
+    max-width: min(30rem, 78%);
+  }
+
+  /* Keep controls large enough for touch */
+  .chat-wallpaper [aria-label='Attach file'],
+  .chat-wallpaper [aria-label='Open emoji picker'],
+  .chat-wallpaper [aria-label='Send message'],
+  .chat-wallpaper [aria-label='Hold to record voice'],
+  .chat-wallpaper [aria-label='Back'] {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Keep drawer surfaces compact but comfortable */
+  .fixed.inset-0.z-50 > aside[class*='max-w-'],
+  .fixed.inset-0.z-\[60\] > aside[class*='max-w-'] {
+    max-width: 22rem;
+  }
+}
+
+/* Phase 17.4 responsive hardening: mobile large (481-767) */
+@media (min-width: 481px) and (max-width: 767px) {
+  /* Prevent horizontal scroll and keep mobile panes edge-to-edge */
+  html,
+  body,
+  #root {
+    overflow-x: hidden;
+  }
+
+  .chat-wallpaper,
+  .auth-backdrop {
+    overflow-x: hidden;
+  }
+
+  .chat-wallpaper > header {
+    height: 3.5rem;
+    padding-inline: 0.625rem;
+  }
+
+  .chat-wallpaper > .message-scroll {
+    padding-inline: 0.5rem;
+    padding-top: 0.625rem;
+  }
+
+  /* Smooth touch scrolling inside chat/sidebar lists */
+  .message-scroll,
+  .sidebar-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Bubble width and typography scaled for phone viewport */
+  .max-w-\[min\(30rem\,72\%\)\] {
+    max-width: 84%;
+  }
+
+  .max-w-\[min\(30rem\,72\%\)\] article {
+    font-size: 0.92rem;
+  }
+
+  /* Header and chat-list avatars scale down for smaller widths */
+  .chat-wallpaper > header .h-10.w-10.rounded-full {
+    width: 2.125rem;
+    height: 2.125rem;
+    line-height: 2.125rem;
+    font-size: 0.72rem;
+  }
+
+  .sidebar-scroll .h-11.w-11.rounded-full {
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    font-size: 0.8rem;
+  }
+
+  /* Keep composer anchored visually at bottom with safe-area spacing */
+  .chat-wallpaper > footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 25;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+
+  /* Ensure mobile touch targets meet 44x44 guidance */
+  .chat-wallpaper [aria-label='Attach file'],
+  .chat-wallpaper [aria-label='Open emoji picker'],
+  .chat-wallpaper [aria-label='Send message'],
+  .chat-wallpaper [aria-label='Hold to record voice'],
+  .chat-wallpaper [aria-label='Back'] {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Keep chat row internals shrink-safe */
+  .chat-wallpaper .min-w-0,
+  .sidebar-scroll .min-w-0 {
+    min-width: 0;
+  }
+
+  /* Drawers and overlays become near full-screen on mobile */
+  .fixed.inset-0.z-50 > aside[class*='max-w-'],
+  .fixed.inset-0.z-\[60\] > aside[class*='max-w-'] {
+    width: 100%;
+    max-width: none;
+    border-left: 0;
+  }
+
+  /* Sidebar "create group" modal uses available screen space */
+  aside .absolute.inset-0.z-20 {
+    padding: 0.75rem;
+  }
+
+  aside .absolute.inset-0.z-20 > .mx-auto.mt-10.max-w-sm {
+    margin-top: 0;
+    width: 100%;
+    max-width: none;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  /* Keep floating menus inside viewport width */
+  [data-message-context-menu],
+  [data-message-reaction-picker] {
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  /* Auth surface remains readable on mid-size phones */
+  .auth-backdrop {
+    padding-inline: 0.75rem;
+    padding-block: 0.75rem;
+  }
+
+  .auth-backdrop .auth-orb {
+    width: 18rem;
+    height: 18rem;
+    filter: blur(44px);
+  }
+}
+
+/* Phase 17.4 responsive hardening: mobile small (320-480) */
+@media (min-width: 320px) and (max-width: 480px) {
+  /* Lock out horizontal overflow on the smallest screens */
+  html,
+  body,
+  #root {
+    overflow-x: hidden;
+  }
+
+  .chat-wallpaper,
+  .auth-backdrop {
+    overflow-x: hidden;
+  }
+
+  /* Compact top bar and main chat paddings */
+  .chat-wallpaper > header {
+    height: 3.25rem;
+    padding-inline: 0.5rem;
+  }
+
+  .chat-wallpaper > .message-scroll {
+    padding-inline: 0.375rem;
+    padding-top: 0.5rem;
+  }
+
+  .chat-wallpaper > .message-scroll .mx-auto.max-w-4xl {
+    gap: 0.25rem;
+  }
+
+  /* Bubble width widened to avoid cramped wrapping */
+  .max-w-\[min\(30rem\,72\%\)\] {
+    max-width: 90%;
+  }
+
+  .max-w-\[min\(30rem\,72\%\)\] article {
+    font-size: 0.88rem;
+    padding-inline: 0.625rem;
+  }
+
+  /* Smaller avatars while preserving legibility */
+  .chat-wallpaper > header .h-10.w-10.rounded-full {
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    font-size: 0.7rem;
+  }
+
+  .sidebar-scroll .h-11.w-11.rounded-full {
+    width: 2.25rem;
+    height: 2.25rem;
+    line-height: 2.25rem;
+    font-size: 0.74rem;
+  }
+
+  /* Keep composer native-like and safe-area aware */
+  .chat-wallpaper > footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 25;
+    padding-inline: 0.5rem;
+    padding-block: 0.375rem;
+    padding-bottom: calc(0.375rem + env(safe-area-inset-bottom));
+  }
+
+  .chat-wallpaper > footer .mx-auto.flex.w-full.max-w-4xl.items-end.gap-2 {
+    gap: 0.375rem;
+  }
+
+  .chat-wallpaper textarea {
+    padding-inline: 0.75rem;
+    font-size: 0.88rem;
+  }
+
+  /* Enforce minimum 44x44 targets for primary chat actions */
+  .chat-wallpaper [aria-label='Attach file'],
+  .chat-wallpaper [aria-label='Open emoji picker'],
+  .chat-wallpaper [aria-label='Send message'],
+  .chat-wallpaper [aria-label='Hold to record voice'],
+  .chat-wallpaper [aria-label='Back'] {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Keep touch scroll behavior smooth */
+  .message-scroll,
+  .sidebar-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Full-screen behavior for drawers/modals on narrow phones */
+  .fixed.inset-0.z-50 > aside[class*='max-w-'],
+  .fixed.inset-0.z-\[60\] > aside[class*='max-w-'] {
+    width: 100%;
+    max-width: none;
+    border-left: 0;
+  }
+
+  aside .absolute.inset-0.z-20 {
+    padding: 0;
+  }
+
+  aside .absolute.inset-0.z-20 > .mx-auto.mt-10.max-w-sm {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    margin-top: 0;
+    border-radius: 0;
+    overflow-y: auto;
+  }
+
+  /* Keep floating message menus constrained on narrow viewport */
+  [data-message-context-menu],
+  [data-message-reaction-picker] {
+    max-width: calc(100vw - 0.75rem) !important;
+  }
+
+  /* Auth layout compaction for smallest phones */
+  .auth-backdrop {
+    padding-inline: 0.5rem;
+    padding-block: 0.5rem;
+  }
+
+  .auth-backdrop .auth-orb {
+    width: 15rem;
+    height: 15rem;
+    filter: blur(40px);
+  }
+
+  .auth-backdrop section {
+    border-radius: 1.25rem;
+  }
+}
+
+/* Phase 17.4 responsive hardening: mobile landscape compaction */
+@media (max-width: 767px) and (orientation: landscape) {
+  /* Recover vertical space for message timeline */
+  .chat-wallpaper > header {
+    height: 3rem;
+  }
+
+  .chat-wallpaper > .message-scroll {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .chat-wallpaper > footer {
+    padding-top: 0.25rem;
+    padding-bottom: calc(0.25rem + env(safe-area-inset-bottom));
+  }
+
+  /* Keep overlay content visible in compact-height viewports */
+  .fixed.inset-0.z-50 > aside[class*='max-w-'],
+  .fixed.inset-0.z-\[60\] > aside[class*='max-w-'] {
+    overflow-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
