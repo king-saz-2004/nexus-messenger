@@ -40,6 +40,7 @@ The project was also motivated by a simple frustration: many self-hosted and tea
 - Contacts and user lookup
 - Root admin bootstrap, private registration approval, registration settings, media limits, and administrative cleanup controls
 - English and Persian UI support with RTL layout support
+- Progressive Web App (PWA) support for installable app-like use
 - Docker Compose deployment with PostgreSQL and Redis
 
 ## Tech Stack
